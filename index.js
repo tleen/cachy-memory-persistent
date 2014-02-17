@@ -11,7 +11,8 @@ module.exports = function(config){
 
   var configuration = _.defaults({}, config, {
     file : './.cache.json',
-    every : 60000
+    every : 60000,
+    onexit : true
   });
 
   var cache = require('cachy-memory')();
@@ -32,7 +33,10 @@ module.exports = function(config){
 
   var clean = _.partial(fs.removeSync,configuration.file);
 
- // xx - on shutdown, write
+ // on shutdown, write
+  process.on('exit', function(code){
+    if(configuration.onexit) fs.writeJsonSync(configuration.file, cache.get());
+  });
 
  // xx- wrap in operation counter/flag, only write if diff
   return {

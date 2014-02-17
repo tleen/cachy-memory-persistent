@@ -7,7 +7,7 @@ should = require('should'),
 _ = require('underscore');
 
 describe('versioning', function(){
-  var cache = require('..')();
+  var cache = require('..')({onexit : false});
 
   it('should have a version', function(){
     cache.should.have.property('version');
@@ -20,7 +20,7 @@ describe('versioning', function(){
 
 
 describe('cachy storage interface exists', function(){
-  var cache = require('..')();
+  var cache = require('..')({onexit : false});
 
   var fxns = ['write', 'has', 'read', 'remove', 'clear', 'keys', 'size'];
   describe('interface has', function(){
@@ -55,7 +55,8 @@ describe('file ops', function(){
     fs.removeSync(filename);
     cache = require('..')({
       file : filename,
-      every : time});
+      every : time,
+      onexit : false});
     async.each(keys, function(key, callback){cache.write(key, data[key], callback); }, done);
   });
   
@@ -91,7 +92,8 @@ describe('file ops', function(){
   describe('loads from file', function(){
     cache = require('..')({
       file : filename,
-      every : time});
+      every : time,
+      onexit : false}); // dont write this one out on process exit so cleanup works
     it('should have matching size', function(done){
       cache.size(function(size){
 	_.size(data).should.equal(size);
@@ -112,7 +114,7 @@ describe('file ops', function(){
   });
 
   after(function(done){
-    cache.clear(done);
+    fs.remove(filename, done);
   });
 
 });
